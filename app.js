@@ -1,6 +1,7 @@
 import express from "express"
 import dotenv from "dotenv"
 import { sequelize } from "./utils/mysql.database.js"
+import { routesOfUsers } from './routes/user.routes.js'
 
 dotenv.config()
 
@@ -8,9 +9,9 @@ const app = express()
 const PORT = process.env.PORT ?? 3000
 
 app.use(express.json())
+app.use('/auth', routesOfUsers)
 
 try {
-    await sequelize.authenticate()
     await sequelize.sync({ force: true })
     console.log("Conexión a la base de datos establecida correctamente.")
 } catch (error) {

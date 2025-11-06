@@ -6,20 +6,6 @@ const userSchema = z.object({
 })
 
 export const validateUser = (userData) => {
-    const result = userSchema.safeParse(userData)
-    if (!result.success) {
-        const errors = result.error.errors.map(err => err.message)
-        throw new Error("Validación fallida: " + errors.join(", "))
-    }
-    return result.data
+    return userSchema.safeParse(userData)
 }
 
-export const validateLogin = (loginData) => {
-    const result = userSchema.partial().safeParse(loginData)
-
-    if (!result.success) {
-        const errors = result.error.errors.map(err => err.message)
-        throw new Error("Validación de inicio de sesión fallida: " + errors.join(", "))
-    }
-    return result.data
-}
