@@ -1,12 +1,12 @@
 import { UserService } from '../services/user.services.js'
-import { validateUser, validateLogin } from '../validations/user.validation.js'
+import { validateUser } from '../validations/user.validation.js'
 
 export class UserController {
     static async registerUser(req, res) {
         const validation = validateUser(req.body)
 
         if (!validation.success) {
-            return res.status(400).json({ error: validation.error.message })
+            return res.status(400).json({ errors: validation.error.issues })
         }
 
         const { username, password } = validation.data
@@ -15,7 +15,8 @@ export class UserController {
             const newUser = await UserService.registerUser({ username, password })
             return res.status(201).json({ message: "Usuario creado exitosamente", user: newUser.username })
         } catch (error) {
-            if (error.message === "El nombre de usuario ya está en uso.") {
+
+            if (error.message === "Error al registrar el usuario: El nombre de usuario ya está en uso.") {
                 return res.status(409).json({ message: error.message });
             }
 
@@ -25,7 +26,7 @@ export class UserController {
     }
 
     static async loginUser(req, res) {
-        const validation = validateLogin(req.body)
+        const validation = validateUser(req.body)
 
         if (!validation.success) {
             return res.status(400).json({ error: validation.error.message })
