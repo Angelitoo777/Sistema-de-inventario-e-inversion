@@ -4,6 +4,7 @@ import { Sales } from './sales.model.js';
 import { detailsSales } from './detailsSales.model.js';
 import { Buys } from './buys.model.js';
 import { Inventory } from './inventory.model.js';
+import { Products } from './products.model.js';
 
 
 // Un Usuario (User) tiene muchos Clientes (Clients)
@@ -42,6 +43,16 @@ Users.hasMany(Sales, {
     as: 'salesRegistered' // Quién registró la venta
 });
 Sales.belongsTo(Users, {
+    foreignKey: 'userId',
+    as: 'user'
+});
+
+// Un Usuario (User) tiene muchos Productos (el Catálogo)
+Users.hasMany(Products, {
+    foreignKey: 'userId', // Añadirá userId a Products
+    as: 'products'
+});
+Products.belongsTo(Users, {
     foreignKey: 'userId',
     as: 'user'
 });
@@ -87,5 +98,6 @@ export {
     Sales,
     detailsSales,
     Buys,
-    Inventory
+    Inventory,
+    Products
 };

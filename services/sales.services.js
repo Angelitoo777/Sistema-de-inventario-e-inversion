@@ -23,7 +23,8 @@ export class SalesService {
             const dataOfTicket = {
                 userId: userId,
                 clientId: saleData.clientId,
-                estado_pago: saleData.estado_pago
+                status: saleData.status,
+                date: new Date()
             }
 
             const newSale = await SaleRepository.createSale(dataOfTicket, t);
@@ -35,7 +36,7 @@ export class SalesService {
                 saleId: detailsId
             }))
 
-            await SaleRepository.createDetailsSales(detailsSaleData, t);
+            await SaleRepository.createDetailSale(detailsSaleData, t);
 
             await t.commit();
 
