@@ -1,9 +1,23 @@
 import { SaleRepository } from '../repository/sale.repository.js';
 import { ClientRepository } from '../repository/client.repository.js';
 import { sequelize } from '../utils/mysql.database.js';
-import { where } from 'sequelize';
 
 export class SalesService {
+
+    static async getAllSales(userId) {
+        return await SaleRepository.getAll(userId);
+    }
+
+    static async getSaleById(id, userId) {
+        const sale = await SaleRepository.getById(id, userId);
+
+        if (!sale) {
+            throw new Error('Venta no encontrada o no autorizada')
+        }
+
+        return sale
+    }
+
     static async createSale(userId, saleData) {
 
         if (saleData.clientId) {

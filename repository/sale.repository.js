@@ -1,7 +1,30 @@
-import { Sales, detailsSales } from "../models/associations.js";
+import { Sales, detailsSales, Clients } from "../models/associations.js";
 
 export class SaleRepository {
-    //TODO Implement update status
+
+    static async getAll(userId) {
+        return await Sales.findAll({
+            where: { userId },
+            include: [{ model: Clients, as: 'client' }]
+        })
+    }
+
+    static async getById(id, userId) {
+        return await Sales.findOne({
+            where: {
+                id,
+                userId
+            },
+            include: [{
+                model: Clients,
+                as: 'client'
+            },
+            {
+                model: detailsSales,
+                as: 'details'
+            }]
+        })
+    }
 
     static async findByIdAndUser(id, userId) {
         return await Sales.findOne({

@@ -2,6 +2,34 @@ import { SalesService } from '../services/sales.services.js';
 import { validateSale, validateUpdateSaleStatus } from '../validations/sale.validation.js';
 
 export class SaleController {
+
+    static async getAllSales(req, res) {
+        const userId = req.user.id;
+
+        try {
+            const sales = await SalesService.getAllSales(userId);
+            return res.status(200).json(sales);
+        } catch (error) {
+            console.error(error.message)
+            return res.status(500).json({ message: 'Error interno del servidor' });
+        }
+    }
+
+    static async getSaleById(req, res) {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        try {
+            const sale = await SalesService.getSaleById(id, userId);
+            return res.status(200).json(sale);
+        } catch (error) {
+            if (error.message === 'Venta no encontrada o no autorizada') {
+                return res.status(404).json({ message: error.message });
+            }
+            return res.status(500).json({ message: 'Error interno del servidor' });
+        }
+    }
+
     static async createSale(req, res) {
         const validation = validateSale(req.body);
 
