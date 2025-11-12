@@ -1,6 +1,7 @@
 import { SaleRepository } from '../repository/sale.repository.js';
 import { ClientRepository } from '../repository/client.repository.js';
 import { sequelize } from '../utils/mysql.database.js';
+import { where } from 'sequelize';
 
 export class SalesService {
     static async createSale(userId, saleData) {
@@ -45,5 +46,15 @@ export class SalesService {
             await t.rollback();
             throw error;
         }
+    }
+
+    static async updateSaleStatus(saleId, userId, newStatus) {
+        const sale = await SaleRepository.findByIdAndUser(saleId, userId);
+
+        if (!sale) {
+            throw new Error('Venta no encontrada o no autorizada');
+        }
+
+        return await SaleRepository.updatedStatus(saleId, userId, newStatus);
     }
 }

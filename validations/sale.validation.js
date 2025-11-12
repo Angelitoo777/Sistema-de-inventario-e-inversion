@@ -36,6 +36,18 @@ const saleSchema = z.object({
     }
 });
 
+const updateSaleStatusSchema = z.object({
+    status: z.enum(['pagado', 'pendiente'], {
+        required_error: "El estado de pago es requerido"
+    })
+});
+
 export const validateSale = (saleData) => {
     return saleSchema.safeParse(saleData);
+};
+
+
+
+export const validateUpdateSaleStatus = (data) => {
+    return updateSaleStatusSchema.safeParse(data);
 };

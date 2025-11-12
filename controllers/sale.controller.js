@@ -1,5 +1,5 @@
 import { SalesService } from '../services/sales.services.js';
-import { validateSale } from '../validations/sale.validation.js';
+import { validateSale, validateUpdateSaleStatus } from '../validations/sale.validation.js';
 
 export class SaleController {
     static async createSale(req, res) {
@@ -26,6 +26,34 @@ export class SaleController {
             }
 
             return res.status(500).json({ message: 'Error interno del servidor' })
+        }
+    }
+
+    static async updateSaleStatus(req, res) {
+        const { id } = req.params
+        const userId = req.user.id;
+        const validation = validateUpdateSaleStatus(req.body);
+
+        if (!validation.success) {
+            return res.status(400).json({ errors: validation.error.issues });
+        }
+
+        const newStatus = validation.data.status;
+
+        try {
+            const updated = await SalesService.updateSaleStatus(id, userId, newStatus);
+
+            if (!updated) {
+                return res.status(404).json({ message: 'Venta no encontrada o acción no autorizada' });
+            }
+
+            return res.status(200).json({ message: 'Estado de la venta actualizado correctamente' });
+        } catch (error) {
+
+            if (error.message.includes("Venta no encontrada")) {
+                return res.status(404).json({ message: error.message });
+            }
+            return res.status(500).json({ message: 'Error interno del servidor' });
         }
     }
 }

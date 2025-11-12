@@ -5,3 +5,4 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
 export const routesOfSale = Router();
 
 routesOfSale.post('/ventas', authMiddleware, SaleController.createSale);
+routesOfSale.patch('/ventas/:id', authMiddleware, SaleController.updateSaleStatus);
