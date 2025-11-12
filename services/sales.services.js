@@ -1,74 +1,72 @@
-import { SaleRepository } from '../repository/sale.repository.js';
-import { ClientRepository } from '../repository/client.repository.js';
-import { sequelize } from '../utils/mysql.database.js';
+import { SaleRepository } from '../repository/sale.repository.js'
+import { ClientRepository } from '../repository/client.repository.js'
+import { sequelize } from '../utils/mysql.database.js'
 
 export class SalesService {
+  static async getAllSales (userId) {
+    return await SaleRepository.getAll(userId)
+  }
 
-    static async getAllSales(userId) {
-        return await SaleRepository.getAll(userId);
+  static async getSaleById (id, userId) {
+    const sale = await SaleRepository.getById(id, userId)
+
+    if (!sale) {
+      throw new Error('Venta no encontrada o no autorizada')
     }
 
-    static async getSaleById(id, userId) {
-        const sale = await SaleRepository.getById(id, userId);
+    return sale
+  }
 
-        if (!sale) {
-            throw new Error('Venta no encontrada o no autorizada')
-        }
+  static async createSale (userId, saleData) {
+    if (saleData.clientId) {
+      const client = await ClientRepository.findClientById(saleData.clientId)
 
-        return sale
+      if (!client) {
+        throw new Error('El cliente especificado no existe')
+      }
+
+      if (client.userId !== userId) {
+        throw new Error('Acción no autorizada sobre el cliente"')
+      }
     }
 
-    static async createSale(userId, saleData) {
+    const t = await sequelize.transaction()
 
-        if (saleData.clientId) {
-            const client = await ClientRepository.findClientById(saleData.clientId);
+    try {
+      const dataOfTicket = {
+        userId,
+        clientId: saleData.clientId,
+        status: saleData.status,
+        date: new Date()
+      }
 
-            if (!client) {
-                throw new Error('El cliente especificado no existe');
-            }
+      const newSale = await SaleRepository.createSale(dataOfTicket, t)
 
-            if (client.userId !== userId) {
-                throw new Error('Acción no autorizada sobre el cliente"');
-            }
-        }
+      const detailsId = newSale.id
 
-        const t = await sequelize.transaction();
+      const detailsSaleData = saleData.details.map((detail) => ({
+        ...detail,
+        saleId: detailsId
+      }))
 
-        try {
-            const dataOfTicket = {
-                userId: userId,
-                clientId: saleData.clientId,
-                status: saleData.status,
-                date: new Date()
-            }
+      await SaleRepository.createDetailSale(detailsSaleData, t)
 
-            const newSale = await SaleRepository.createSale(dataOfTicket, t);
+      await t.commit()
 
-            const detailsId = newSale.id;
+      return newSale
+    } catch (error) {
+      await t.rollback()
+      throw error
+    }
+  }
 
-            const detailsSaleData = saleData.details.map((detail) => ({
-                ...detail,
-                saleId: detailsId
-            }))
+  static async updateSaleStatus (saleId, userId, newStatus) {
+    const sale = await SaleRepository.findByIdAndUser(saleId, userId)
 
-            await SaleRepository.createDetailSale(detailsSaleData, t);
-
-            await t.commit();
-
-            return newSale;
-        } catch (error) {
-            await t.rollback();
-            throw error;
-        }
+    if (!sale) {
+      throw new Error('Venta no encontrada o no autorizada')
     }
 
-    static async updateSaleStatus(saleId, userId, newStatus) {
-        const sale = await SaleRepository.findByIdAndUser(saleId, userId);
-
-        if (!sale) {
-            throw new Error('Venta no encontrada o no autorizada');
-        }
-
-        return await SaleRepository.updatedStatus(saleId, userId, newStatus);
-    }
+    return await SaleRepository.updatedStatus(saleId, userId, newStatus)
+  }
 }

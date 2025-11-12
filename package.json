@@ -14,6 +14,9 @@
     "sequelize": "6.37.7",
     "zod": "4.1.12"
   },
+  "eslintConfig": {
+    "extends": "standard"
+  },
   "name": "sistema-de-inventario-e-inversion",
   "version": "1.0.0",
   "description": "Sistema de inventario e inversion para manejar las compras y ventas de un producto",
