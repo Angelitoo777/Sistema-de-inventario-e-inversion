@@ -1,11 +1,12 @@
-import express from "express"
-import dotenv from "dotenv"
-import { sequelize } from "./utils/mysql.database.js"
+import express from 'express'
+import dotenv from 'dotenv'
+import { sequelize } from './utils/mysql.database.js'
 import { routesOfUsers } from './routes/user.routes.js'
-import { routesOfSale } from "./routes/sale.routes.js"
-import { routesOfClient } from "./routes/client.routes.js"
-import { routesOfProducts } from "./routes/products.routes.js"
-import cookieParser from "cookie-parser"
+import { routesOfSale } from './routes/sale.routes.js'
+import { routesOfClient } from './routes/client.routes.js'
+import { routesOfProducts } from './routes/products.routes.js'
+import { routesOfBuy } from './routes/buy.routes.js'
+import cookieParser from 'cookie-parser'
 
 dotenv.config()
 
@@ -18,18 +19,19 @@ app.use('/auth', routesOfUsers)
 app.use('/api', routesOfSale)
 app.use('/api', routesOfClient)
 app.use('/api', routesOfProducts)
+app.use('/api', routesOfBuy)
 
 try {
-    await sequelize.sync({ force: true })
-    console.log("Conexión a la base de datos establecida correctamente.")
+  await sequelize.sync({ force: true })
+  console.log('Conexión a la base de datos establecida correctamente.')
 } catch (error) {
 
 }
 
-app.get("/", (req, res) => {
-    res.send("Hola Mundo")
+app.get('/', (req, res) => {
+  res.send('Hola Mundo')
 })
 
 app.listen(PORT, () => {
-    console.log(`Servidor escuchando en el puerto ${PORT}`)
+  console.log(`Servidor escuchando en el puerto ${PORT}`)
 })
